@@ -78,6 +78,7 @@ public class PathAndMethodAnomalyAnalyzer {
 
         boolean pathFound = false;
         boolean methodFound = false;
+        List<String> expectedMethods = new ArrayList<>();
         // Her bir provided endpoint için kontrol et
         for (JsonNode providedEndpoint : providedEndpoints) {
             String providedPath = providedEndpoint.has("path") ? providedEndpoint.get("path").asText() : "/";
@@ -87,8 +88,7 @@ public class PathAndMethodAnomalyAnalyzer {
             if (pathsMatch(calledPath, providedPath, consumedPathVariables, providedPathVariables)) {
                 pathFound = true;
                 String providedMethod = providedEndpoint.has("httpMethod") ?
-                        providedEndpoint.get("httpMethod").asText() : "unknown";
-
+                        providedEndpoint.get("httpMethod").asText() : "UndefinedMethod";
                 // Method uyumlu mu?
                 if (calledMethod.equals(providedMethod)) {
                     methodFound = true;
@@ -96,6 +96,7 @@ public class PathAndMethodAnomalyAnalyzer {
                     //todo: paths and methods is validated. Now start request param analyzer
                     break;
                 }
+                expectedMethods.add(providedMethod);
             }
         }
 
@@ -121,7 +122,8 @@ public class PathAndMethodAnomalyAnalyzer {
                     providerProductName,
                     providerAppName,
                     calledPath,
-                    calledMethod);
+                    calledMethod,
+                    expectedMethods);
             anomalies.add(methodAnomaly);
         }
 
@@ -260,7 +262,8 @@ public class PathAndMethodAnomalyAnalyzer {
             String providerProductName,
             String providerAppName,
             String calledPath,
-            String calledMethod) {
+            String calledMethod,
+            List<String> expectedMethods) {
 
         Anomaly anomaly = new Anomaly();
 
@@ -284,6 +287,7 @@ public class PathAndMethodAnomalyAnalyzer {
         // Metadata
         ObjectNode metadata = objectMapper.createObjectNode();
         metadata.put("actualMethod", calledMethod);
+        metadata.put("expectedMethods", String.join(",",expectedMethods));
         anomaly.setMetadata(metadata.toPrettyString());
 
         return anomaly;

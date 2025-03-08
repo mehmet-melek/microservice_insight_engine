@@ -173,25 +173,17 @@ public class AnomalyService {
                 dto.setRecommendation(String.format("Adjust the data type of '%s' to a %s.", paramName, expectedType));
                 break;
                 
-            case "Mismatched Path Variable Data Type":
-                String pathVarName = metadata.has("pathVariableName") ? metadata.get("pathVariableName").asText() : "unknown";
-                expectedType = metadata.has("expectedType") ? metadata.get("expectedType").asText() : "unknown";
-                actualType = metadata.has("actualType") ? metadata.get("actualType").asText() : "unknown";
-                dto.setDescription(String.format("The path variable '%s' is provided as a %s, but a %s is expected.", pathVarName, actualType, expectedType));
-                dto.setRecommendation(String.format("Ensure that the '%s' in the URL is of type %s.", pathVarName, expectedType));
-                break;
-                
             case "Undefined Endpoint Called":
-                String calledEndpoint = metadata.has("calledEndpoint") ? metadata.get("calledEndpoint").asText() : "unknown";
-                dto.setDescription(String.format("Service A calls an endpoint '%s' which is not defined in Service B's API contract.", calledEndpoint));
-                dto.setRecommendation("Update Service A to call one of the defined endpoints as per the API documentation.");
+                String calledEndpoint = metadata.has("calledEndpoint") ? metadata.get("calledEndpoint").asText() : "/";
+                dto.setDescription(String.format("%s calls an endpoint '%s' which is not defined in %s's API contract.",dto.getConsumerApplicationName(), calledEndpoint, dto.getProviderApplicationName()));
+                dto.setRecommendation(String.format("Update %s to call one of the defined endpoints as per the API documentation.",dto.getConsumerApplicationName()));
                 break;
                 
             case "Unsupported HTTP Method":
-                String expectedMethod = metadata.has("expectedMethod") ? metadata.get("expectedMethod").asText() : "unknown";
-                String actualMethod = metadata.has("actualMethod") ? metadata.get("actualMethod").asText() : "unknown";
-                dto.setDescription(String.format("Service A calls the endpoint '%s' using the HTTP method %s, which is not supported. The API contract specifies that this endpoint only supports %s.", dto.getEndpoint(), actualMethod, expectedMethod));
-                dto.setRecommendation(String.format("Update Service A to use the correct HTTP method (%s) for the '%s' endpoint.", expectedMethod, dto.getEndpoint()));
+                String expectedMethods = metadata.has("expectedMethods") ? metadata.get("expectedMethods").asText() : "UndefinedMethod";
+                String actualMethod = metadata.has("actualMethod") ? metadata.get("actualMethod").asText() : "UndefinedMethod";
+                dto.setDescription(String.format("%s calls the endpoint '%s' using the HTTP method '%s', which is not supported. The API contract specifies that this endpoint only supports '%s'.",dto.getConsumerApplicationName(), dto.getEndpoint(), actualMethod, expectedMethods));
+                dto.setRecommendation(String.format("Update %s to use the correct HTTP methods (%s) for the '%s' endpoint.",dto.getConsumerApplicationName(), expectedMethods, dto.getEndpoint()));
                 break;
                 
             default:

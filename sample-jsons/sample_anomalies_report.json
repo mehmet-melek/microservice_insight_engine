@@ -87,20 +87,6 @@
       }
     },
     {
-      "title": "Mismatched Path Variable Data Type",
-      "importance": "High",
-      "issueType": "Potential Bug",
-      "endpoint": "/example/endpoint7/{orderId}",
-      "httpMethod": "GET",
-      "description": "The path variable 'orderId' is provided as a String, but a Long is expected.",
-      "recommendation": "Ensure that the 'orderId' in the URL is of type Long.",
-      "metadata": {
-        "pathVariableName": "orderId",
-        "expectedType": "Long",
-        "actualType": "String"
-      }
-    },
-    {
       "title": "Undefined Endpoint Called",
       "importance": "Critical",
       "issueType": "Potential Bug",
