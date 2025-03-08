@@ -1,0 +1,129 @@
+{
+  "consumerOrganizationName": "ConsumerOrg",
+  "consumerProductName": "ConsumerProduct",
+  "consumerApplicationName": "ConsumerApp",
+  "providerOrganizationName": "ProviderOrg",
+  "providerProductName": "ProviderProduct",
+  "providerApplicationName": "ProviderApp",
+  "anomalies": [
+    {
+      "title": "Missing Required Field in Request Body",
+      "importance": "High",
+      "issueType": "Potential Bug",
+      "endpoint": "/example/endpoint1",
+      "httpMethod": "POST",
+      "description": "A required field 'username' is missing in the request body.",
+      "recommendation": "Include the required field 'username' in the request body.",
+      "metadata": {
+        "fieldName": "username",
+        "expectedType": "String"
+      }
+    },
+    {
+      "title": "Extra Field in Request Body",
+      "importance": "Medium",
+      "issueType": "Warning",
+      "endpoint": "/example/endpoint2",
+      "httpMethod": "POST",
+      "description": "An extra field 'discountCode' is present in the request body which is not defined in the API contract.",
+      "recommendation": "Remove the extra field 'discountCode' if it is not needed.",
+      "metadata": {
+        "fieldName": "discountCode",
+        "filedType": "filedType"
+      }
+    },
+    {
+      "title": "Missing Required Request Parameter",
+      "importance": "High",
+      "issueType": "Potential Bug",
+      "endpoint": "/example/endpoint3",
+      "httpMethod": "GET",
+      "description": "The required request parameter 'customerId' is missing.",
+      "recommendation": "Provide the required request parameter 'customerId'.",
+      "metadata": {
+        "parameterName": "customerId",
+        "expectedType": "String"
+      }
+    },
+    {
+      "title": "Unexpected Request Parameter",
+      "importance": "Low",
+      "issueType": "Informational",
+      "endpoint": "/example/endpoint4",
+      "httpMethod": "GET",
+      "description": "An unexpected request parameter 'debug' is provided.",
+      "recommendation": "Remove the unexpected parameter 'debug' if not required.",
+      "metadata": {
+        "parameterName": "debug",
+        "parameterType": "String"
+      }
+    },
+    {
+      "title": "Mismatched Data Type in Request Body",
+      "importance": "High",
+      "issueType": "Potential Bug",
+      "endpoint": "/example/endpoint5",
+      "httpMethod": "POST",
+      "description": "The field 'age' is sent as a String, but an Integer is expected in the request body.",
+      "recommendation": "Send the field 'age' as an Integer.",
+      "metadata": {
+        "fieldName": "age",
+        "expectedType": "Integer",
+        "actualType": "String"
+      }
+    },
+    {
+      "title": "Mismatched Data Type in Request Parameter",
+      "importance": "High",
+      "issueType": "Potential Bug",
+      "endpoint": "/example/endpoint6",
+      "httpMethod": "GET",
+      "description": "The request parameter 'quantity' is sent as a String, but a Number is expected.",
+      "recommendation": "Adjust the data type of 'quantity' to a Number.",
+      "metadata": {
+        "parameterName": "quantity",
+        "expectedType": "Number",
+        "actualType": "String"
+      }
+    },
+    {
+      "title": "Mismatched Path Variable Data Type",
+      "importance": "High",
+      "issueType": "Potential Bug",
+      "endpoint": "/example/endpoint7/{orderId}",
+      "httpMethod": "GET",
+      "description": "The path variable 'orderId' is provided as a String, but a Long is expected.",
+      "recommendation": "Ensure that the 'orderId' in the URL is of type Long.",
+      "metadata": {
+        "pathVariableName": "orderId",
+        "expectedType": "Long",
+        "actualType": "String"
+      }
+    },
+    {
+      "title": "Undefined Endpoint Called",
+      "importance": "Critical",
+      "issueType": "Potential Bug",
+      "endpoint": "/nonexistent/path",
+      "httpMethod": "GET",
+      "description": "Service A calls an endpoint '/nonexistent/path' which is not defined in Service B's API contract.",
+      "recommendation": "Update Service A to call one of the defined endpoints as per the API documentation.",
+      "metadata": {
+        "calledEndpoint": "/nonexistent/path"
+      }
+    },
+    {
+      "title": "Unsupported HTTP Method",
+      "importance": "Critical",
+      "issueType": "Potential Bug",
+      "endpoint": "/orders",
+      "httpMethod": "PUT",
+      "description": "Service A calls the endpoint '/orders' using the HTTP method PUT, which is not supported. The API contract specifies that this endpoint only supports POST.",
+      "recommendation": "Update Service A to use the correct HTTP method (POST) for the '/orders' endpoint.",
+      "metadata": {
+        "expectedMethod": "POST",
+        "actualMethod": "PUT"
+      }
+    }
+  ]
+}

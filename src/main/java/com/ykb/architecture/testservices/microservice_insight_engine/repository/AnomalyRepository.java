@@ -1,6 +1,6 @@
 package com.ykb.architecture.testservices.microservice_insight_engine.repository;
 
-import com.ykb.architecture.testservices.microservice_insight_engine.model.Anomaly;
+import com.ykb.architecture.testservices.microservice_insight_engine.model.anomaly.Anomaly;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

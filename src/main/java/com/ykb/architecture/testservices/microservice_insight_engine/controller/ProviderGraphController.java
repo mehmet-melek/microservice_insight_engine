@@ -3,7 +3,7 @@ package com.ykb.architecture.testservices.microservice_insight_engine.controller
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.ApplicationEdge;
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.Edge;
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.GraphData;
-import com.ykb.architecture.testservices.microservice_insight_engine.service.GraphService;
+import com.ykb.architecture.testservices.microservice_insight_engine.service.graph.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

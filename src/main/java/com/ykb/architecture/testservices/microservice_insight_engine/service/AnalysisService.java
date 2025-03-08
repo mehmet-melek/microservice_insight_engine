@@ -4,6 +4,7 @@ import com.ykb.architecture.testservices.microservice_insight_engine.model.ApiAn
 import com.ykb.architecture.testservices.microservice_insight_engine.model.ApplicationInfo;
 import com.ykb.architecture.testservices.microservice_insight_engine.repository.ApiAnalysisRepository;
 import com.ykb.architecture.testservices.microservice_insight_engine.repository.ApplicationInfoRepository;
+import com.ykb.architecture.testservices.microservice_insight_engine.service.anomaly.AnomalyAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

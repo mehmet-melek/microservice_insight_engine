@@ -3,9 +3,9 @@ package com.ykb.architecture.testservices.microservice_insight_engine.controller
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ykb.architecture.testservices.microservice_insight_engine.model.ApiAnalysis;
-import com.ykb.architecture.testservices.microservice_insight_engine.model.ApiRelation;
+import com.ykb.architecture.testservices.microservice_insight_engine.model.relation.ApiRelation;
 import com.ykb.architecture.testservices.microservice_insight_engine.service.AnalysisService;
-import com.ykb.architecture.testservices.microservice_insight_engine.service.ApiRelationService;
+import com.ykb.architecture.testservices.microservice_insight_engine.service.relation.ApiRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

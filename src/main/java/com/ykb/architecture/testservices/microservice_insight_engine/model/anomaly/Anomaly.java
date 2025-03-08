@@ -1,8 +1,7 @@
-package com.ykb.architecture.testservices.microservice_insight_engine.model;
+package com.ykb.architecture.testservices.microservice_insight_engine.model.anomaly;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import com.fasterxml.jackson.databind.JsonNode;
 
 @Document(collection = "anomalies")
 public class Anomaly {
@@ -25,7 +24,27 @@ public class Anomaly {
     private String httpMethod;
     
     // Metadata JSON olarak saklanacak (farklı anomali türleri için farklı yapılar)
-    private JsonNode metadata;
+    private String metadata;
+
+
+    public Anomaly() {
+    }
+
+    public Anomaly(String id, String consumerOrganizationName, String consumerProductName, String consumerApplicationName, String providerOrganizationName, String providerProductName, String providerApplicationName, String title, String importance, String issueType, String endpoint, String httpMethod, String metadata) {
+        this.id = id;
+        this.consumerOrganizationName = consumerOrganizationName;
+        this.consumerProductName = consumerProductName;
+        this.consumerApplicationName = consumerApplicationName;
+        this.providerOrganizationName = providerOrganizationName;
+        this.providerProductName = providerProductName;
+        this.providerApplicationName = providerApplicationName;
+        this.title = title;
+        this.importance = importance;
+        this.issueType = issueType;
+        this.endpoint = endpoint;
+        this.httpMethod = httpMethod;
+        this.metadata = metadata;
+    }
 
     // Getters and Setters
     public String getId() {
@@ -124,11 +143,11 @@ public class Anomaly {
         this.httpMethod = httpMethod;
     }
 
-    public JsonNode getMetadata() {
+    public String getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(JsonNode metadata) {
+    public void setMetadata(String metadata) {
         this.metadata = metadata;
     }
 } 

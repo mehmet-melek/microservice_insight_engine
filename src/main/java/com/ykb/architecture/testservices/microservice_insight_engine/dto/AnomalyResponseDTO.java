@@ -24,6 +24,27 @@ public class AnomalyResponseDTO {
     
     private JsonNode metadata;
 
+    public AnomalyResponseDTO() {
+    }
+
+    public AnomalyResponseDTO(String id, String consumerOrganizationName, String consumerProductName, String consumerApplicationName, String providerOrganizationName, String providerProductName, String providerApplicationName, String title, String importance, String issueType, String endpoint, String httpMethod, String description, String recommendation, JsonNode metadata) {
+        this.id = id;
+        this.consumerOrganizationName = consumerOrganizationName;
+        this.consumerProductName = consumerProductName;
+        this.consumerApplicationName = consumerApplicationName;
+        this.providerOrganizationName = providerOrganizationName;
+        this.providerProductName = providerProductName;
+        this.providerApplicationName = providerApplicationName;
+        this.title = title;
+        this.importance = importance;
+        this.issueType = issueType;
+        this.endpoint = endpoint;
+        this.httpMethod = httpMethod;
+        this.description = description;
+        this.recommendation = recommendation;
+        this.metadata = metadata;
+    }
+
     // Getters and Setters
     public String getId() {
         return id;

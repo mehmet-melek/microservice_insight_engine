@@ -1,8 +1,7 @@
 package com.ykb.architecture.testservices.microservice_insight_engine.controller;
 
 import com.ykb.architecture.testservices.microservice_insight_engine.dto.AnomalyResponseDTO;
-import com.ykb.architecture.testservices.microservice_insight_engine.model.Anomaly;
-import com.ykb.architecture.testservices.microservice_insight_engine.service.AnomalyService;
+import com.ykb.architecture.testservices.microservice_insight_engine.service.anomaly.AnomalyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

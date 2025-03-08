@@ -1,4 +1,4 @@
-package com.ykb.architecture.testservices.microservice_insight_engine.model;
+package com.ykb.architecture.testservices.microservice_insight_engine.model.relation;
 
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.EdgeDetail;
 import org.springframework.data.annotation.Id;

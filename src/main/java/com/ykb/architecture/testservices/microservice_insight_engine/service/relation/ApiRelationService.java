@@ -1,8 +1,8 @@
-package com.ykb.architecture.testservices.microservice_insight_engine.service;
+package com.ykb.architecture.testservices.microservice_insight_engine.service.relation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ykb.architecture.testservices.microservice_insight_engine.model.ApiRelation;
+import com.ykb.architecture.testservices.microservice_insight_engine.model.relation.ApiRelation;
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.EdgeDetail;
 import com.ykb.architecture.testservices.microservice_insight_engine.repository.ApiRelationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

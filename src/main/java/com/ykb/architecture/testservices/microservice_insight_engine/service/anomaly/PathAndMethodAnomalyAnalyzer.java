@@ -3,8 +3,8 @@ package com.ykb.architecture.testservices.microservice_insight_engine.service.an
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ykb.architecture.testservices.microservice_insight_engine.model.Anomaly;
-import com.ykb.architecture.testservices.microservice_insight_engine.service.AnomalyAnalysisService.ProviderAnalysisContext;
+import com.ykb.architecture.testservices.microservice_insight_engine.model.anomaly.Anomaly;
+import com.ykb.architecture.testservices.microservice_insight_engine.model.anomaly.ProviderAnalysisContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -92,6 +92,8 @@ public class PathAndMethodAnomalyAnalyzer {
                 // Method uyumlu mu?
                 if (calledMethod.equals(providedMethod)) {
                     methodFound = true;
+
+                    //todo: paths and methods is validated. Now start request param analyzer
                     break;
                 }
             }
@@ -242,7 +244,7 @@ public class PathAndMethodAnomalyAnalyzer {
         // Metadata
         ObjectNode metadata = objectMapper.createObjectNode();
         metadata.put("calledEndpoint", calledPath);
-        anomaly.setMetadata(metadata);
+        anomaly.setMetadata(metadata.toPrettyString());
 
         return anomaly;
     }
@@ -282,7 +284,7 @@ public class PathAndMethodAnomalyAnalyzer {
         // Metadata
         ObjectNode metadata = objectMapper.createObjectNode();
         metadata.put("actualMethod", calledMethod);
-        anomaly.setMetadata(metadata);
+        anomaly.setMetadata(metadata.toPrettyString());
 
         return anomaly;
     }

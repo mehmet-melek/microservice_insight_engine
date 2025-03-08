@@ -1,8 +1,9 @@
-package com.ykb.architecture.testservices.microservice_insight_engine.service;
+package com.ykb.architecture.testservices.microservice_insight_engine.service.anomaly;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ykb.architecture.testservices.microservice_insight_engine.dto.AnomalyResponseDTO;
-import com.ykb.architecture.testservices.microservice_insight_engine.model.Anomaly;
+import com.ykb.architecture.testservices.microservice_insight_engine.model.anomaly.Anomaly;
 import com.ykb.architecture.testservices.microservice_insight_engine.repository.AnomalyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ public class AnomalyService {
 
     @Autowired
     private AnomalyRepository anomalyRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * Anomalileri kaydet. Önce mevcut anomalileri sil, sonra yenilerini ekle.
@@ -103,7 +107,12 @@ public class AnomalyService {
         dto.setIssueType(anomaly.getIssueType());
         dto.setEndpoint(anomaly.getEndpoint());
         dto.setHttpMethod(anomaly.getHttpMethod());
-        dto.setMetadata(anomaly.getMetadata());
+        try {
+            dto.setMetadata(objectMapper.readTree(anomaly.getMetadata()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         
         // Description ve recommendation oluştur
         return generateDescriptionAndRecommendation(dto);
