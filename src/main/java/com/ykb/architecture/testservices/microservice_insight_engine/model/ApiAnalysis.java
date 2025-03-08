@@ -1,10 +1,14 @@
 package com.ykb.architecture.testservices.microservice_insight_engine.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Document(collection = "api_analysis")
+@CompoundIndex(name = "analysis_unique_idx",
+        def = "{'organizationName': 1, 'productName': 1, 'applicationName': 1}",
+        unique = true)
 public class ApiAnalysis {
     @Id
     private String id;

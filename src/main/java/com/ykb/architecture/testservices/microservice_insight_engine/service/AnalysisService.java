@@ -19,6 +19,9 @@ public class AnalysisService {
     @Autowired
     private ApplicationInfoRepository applicationInfoRepository;
 
+    @Autowired
+    private AnomalyAnalysisService anomalyAnalysisService;
+
     @Transactional
     public ApiAnalysis saveOrUpdateAnalysis(ApiAnalysis newAnalysis) {
         // Önce ApplicationInfo'yu kaydet/güncelle
@@ -33,6 +36,7 @@ public class AnalysisService {
                 newAnalysis.getProductName(),
                 newAnalysis.getApplicationName());
 
+        ApiAnalysis savedAnalysis;
         if(existingOpt.isPresent()){
             ApiAnalysis existing = existingOpt.get();
             existing.setPreviousConsumedEndpoints(existing.getCurrentConsumedEndpoints());
@@ -41,11 +45,18 @@ public class AnalysisService {
             existing.setCurrentProvidedEndpoints(newAnalysis.getCurrentProvidedEndpoints());
             existing.setUpdatedAt(LocalDateTime.now());
 
-            return analysisRepository.save(existing);
+            savedAnalysis = analysisRepository.save(existing);
         } else {
             newAnalysis.setUpdatedAt(LocalDateTime.now());
-            return analysisRepository.save(newAnalysis);
+            savedAnalysis = analysisRepository.save(newAnalysis);
         }
+        
+        //TODO: Anomali analizini asenkron olarak başlat
+        if (savedAnalysis.getCurrentConsumedEndpoints() != null && !savedAnalysis.getCurrentConsumedEndpoints().isEmpty()) {
+            analyzeAnomaliesAsync(savedAnalysis);
+        }
+        
+        return savedAnalysis;
     }
 
     private void saveOrUpdateApplicationInfo(String organizationName, String productName, String applicationName) {
@@ -78,6 +89,22 @@ public class AnalysisService {
     public Optional<ApiAnalysis> findAnalysis(String organizationName, String productName, String applicationName) {
         return analysisRepository.findByOrganizationNameAndProductNameAndApplicationName(
                 organizationName, productName, applicationName);
+    }
+
+    /**
+     * Anomali analizini asenkron olarak çalıştır
+     * Bu sayede API yanıt süresi uzamayacak
+     */
+    private void analyzeAnomaliesAsync(ApiAnalysis analysis) {
+        // Asenkron çağrı (örn. @Async veya CompletableFuture kullanılabilir)
+        new Thread(() -> {
+            try {
+                anomalyAnalysisService.analyzeAndSaveAnomalies(analysis);
+            } catch (Exception e) {
+                // Hata durumunda loglama yapılabilir
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     // Diff hesaplama ve diğer iş mantığı metotlarını ekleyin.
