@@ -182,7 +182,7 @@ public class AnomalyService {
             case "Unsupported HTTP Method":
                 String expectedMethods = metadata.has("expectedMethods") ? metadata.get("expectedMethods").asText() : "UndefinedMethod";
                 String actualMethod = metadata.has("actualMethod") ? metadata.get("actualMethod").asText() : "UndefinedMethod";
-                dto.setDescription(String.format("%s calls the endpoint '%s' using the HTTP method '%s', which is not supported. The API contract specifies that this endpoint only supports '%s'.",dto.getConsumerApplicationName(), dto.getEndpoint(), actualMethod, expectedMethods));
+                dto.setDescription(String.format("%s calls the endpoint '%s' using the HTTP method '%s', which is not supported.",dto.getConsumerApplicationName(), dto.getEndpoint(), actualMethod));
                 dto.setRecommendation(String.format("Update %s to use the correct HTTP methods (%s) for the '%s' endpoint.",dto.getConsumerApplicationName(), expectedMethods, dto.getEndpoint()));
                 break;
                 

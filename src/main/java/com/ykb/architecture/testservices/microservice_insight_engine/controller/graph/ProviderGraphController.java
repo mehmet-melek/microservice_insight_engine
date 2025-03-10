@@ -1,4 +1,4 @@
-package com.ykb.architecture.testservices.microservice_insight_engine.controller;
+package com.ykb.architecture.testservices.microservice_insight_engine.controller.graph;
 
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.ApplicationEdge;
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.Edge;

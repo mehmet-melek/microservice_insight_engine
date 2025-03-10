@@ -4,29 +4,39 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ykb.architecture.testservices.microservice_insight_engine.model.relation.ApiRelation;
 import com.ykb.architecture.testservices.microservice_insight_engine.model.graph.EdgeDetail;
+import com.ykb.architecture.testservices.microservice_insight_engine.model.relation.ServiceEngagementChange;
 import com.ykb.architecture.testservices.microservice_insight_engine.repository.ApiRelationRepository;
+import com.ykb.architecture.testservices.microservice_insight_engine.repository.ServiceEngagementChangeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ApiRelationService {
 
     @Autowired
     private ApiRelationRepository apiRelationRepository;
+    
+    @Autowired
+    private ServiceEngagementChangeRepository serviceEngagementChangeRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Transactional
     public List<ApiRelation> createApiRelations(String organizationName, String productName, String applicationName, JsonNode analysisJson) {
-        // Önce bu uygulamaya (source) ait tüm ilişkileri sil
-        apiRelationRepository.deleteByConsumerOrganizationAndConsumerProductAndConsumerApplication(organizationName,productName,applicationName);
+        // Önce mevcut ilişkileri al (silmeden önce)
+        List<ApiRelation> existingRelations = apiRelationRepository
+                .findByConsumerOrganizationAndConsumerProductAndConsumerApplication(organizationName, productName, applicationName);
         
-        List<ApiRelation> relations = new ArrayList<>();
+        // Sonra yeni ilişkileri oluştur
+        List<ApiRelation> newRelations = new ArrayList<>();
         
         JsonNode consumedEndpoints = analysisJson.get("consumedEndpoints");
         if (consumedEndpoints != null && consumedEndpoints.isArray()) {
@@ -57,11 +67,105 @@ public class ApiRelationService {
                 }
                 relation.setDetails(details);
                 
-                relations.add(relation);
+                newRelations.add(relation);
             }
         }
         
-        return apiRelationRepository.saveAll(relations);
+        // Değişiklikleri tespit et ve kaydet
+        if (!existingRelations.isEmpty()) {
+            detectAndSaveEngagementChanges(existingRelations, newRelations, organizationName, productName, applicationName);
+        }
+        
+        // Eski ilişkileri sil
+        apiRelationRepository.deleteByConsumerOrganizationAndConsumerProductAndConsumerApplication(
+                organizationName, productName, applicationName);
+        
+        // Yeni ilişkileri kaydet
+        return apiRelationRepository.saveAll(newRelations);
+    }
+    
+    /**
+     * Eski ve yeni ilişkiler arasındaki değişiklikleri tespit et ve kaydet
+     */
+    private void detectAndSaveEngagementChanges(
+            List<ApiRelation> existingRelations, 
+            List<ApiRelation> newRelations,
+            String consumerOrg,
+            String consumerProduct,
+            String consumerApp) {
+        
+        // Kolay erişim için mevcut ilişkileri map'e ekle
+        Map<String, ApiRelation> existingRelationsMap = new HashMap<>();
+        for (ApiRelation relation : existingRelations) {
+            String key = getRelationKey(relation);
+            existingRelationsMap.put(key, relation);
+        }
+        
+        // Kolay erişim için yeni ilişkileri map'e ekle
+        Map<String, ApiRelation> newRelationsMap = new HashMap<>();
+        for (ApiRelation relation : newRelations) {
+            String key = getRelationKey(relation);
+            newRelationsMap.put(key, relation);
+        }
+        
+        List<ServiceEngagementChange> changes = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+        
+        // Başlayan engagementları tespit et (yeni ilişkilerde var, eskide yok)
+        for (ApiRelation newRelation : newRelations) {
+            String key = getRelationKey(newRelation);
+            if (!existingRelationsMap.containsKey(key)) {
+                // Yeni başlayan engagement
+                ServiceEngagementChange change = new ServiceEngagementChange(
+                    consumerOrg,
+                    consumerProduct,
+                    consumerApp,
+                    newRelation.getProviderOrganization(),
+                    newRelation.getProviderProduct(),
+                    newRelation.getProviderApplication(),
+                    ServiceEngagementChange.ChangeType.EngagementStarted,
+                    now,
+                    String.format("%s has started consuming service %s.",
+                        consumerApp, newRelation.getProviderApplication())
+                );
+                changes.add(change);
+            }
+        }
+        
+        // Biten engagementları tespit et (eski ilişkilerde var, yenide yok)
+        for (ApiRelation existingRelation : existingRelations) {
+            String key = getRelationKey(existingRelation);
+            if (!newRelationsMap.containsKey(key)) {
+                // Sona eren engagement
+                ServiceEngagementChange change = new ServiceEngagementChange(
+                    consumerOrg,
+                    consumerProduct,
+                    consumerApp,
+                    existingRelation.getProviderOrganization(),
+                    existingRelation.getProviderProduct(),
+                    existingRelation.getProviderApplication(),
+                    ServiceEngagementChange.ChangeType.EngagementEnded,
+                    now,
+                    String.format("%s has stopped consuming service %s.",
+                        consumerApp, existingRelation.getProviderApplication())
+                );
+                changes.add(change);
+            }
+        }
+        
+        // Değişiklikleri kaydet
+        if (!changes.isEmpty()) {
+            serviceEngagementChangeRepository.saveAll(changes);
+        }
+    }
+    
+    /**
+     * İlişki için benzersiz bir anahtar oluştur
+     */
+    private String getRelationKey(ApiRelation relation) {
+        return relation.getProviderOrganization() + ":" + 
+               relation.getProviderProduct() + ":" + 
+               relation.getProviderApplication();
     }
 
     public List<ApiRelation> getAllRelations() {
@@ -76,5 +180,23 @@ public class ApiRelationService {
     public List<ApiRelation> getRelationsByProvider(String organization, String product, String application) {
         return apiRelationRepository.findByProviderOrganizationAndProviderProductAndProviderApplication(
                 organization, product, application);
+    }
+    
+    public List<ServiceEngagementChange> getEngagementChangesByConsumer(
+            String consumerOrg, String consumerProduct, String consumerApp) {
+        return serviceEngagementChangeRepository
+            .findByConsumerOrganizationNameAndConsumerProductNameAndConsumerApplicationName(
+                consumerOrg, consumerProduct, consumerApp);
+    }
+    
+    public List<ServiceEngagementChange> getEngagementChangesByProvider(
+            String providerOrg, String providerProduct, String providerApp) {
+        return serviceEngagementChangeRepository
+            .findByProviderOrganizationNameAndProviderProductNameAndProviderApplicationName(
+                providerOrg, providerProduct, providerApp);
+    }
+    
+    public List<ServiceEngagementChange> getAllEngagementChanges() {
+        return serviceEngagementChangeRepository.findAll();
     }
 }

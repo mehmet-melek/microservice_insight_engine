@@ -1,4 +1,4 @@
-package com.ykb.architecture.testservices.microservice_insight_engine.controller;
+package com.ykb.architecture.testservices.microservice_insight_engine.controller.anomaly;
 
 import com.ykb.architecture.testservices.microservice_insight_engine.dto.AnomalyResponseDTO;
 import com.ykb.architecture.testservices.microservice_insight_engine.service.anomaly.AnomalyService;
