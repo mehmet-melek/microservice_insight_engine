@@ -7,6 +7,9 @@ import com.ykb.architecture.testservices.microservice_insight_engine.model.graph
 import com.ykb.architecture.testservices.microservice_insight_engine.model.relation.ServiceEngagementChange;
 import com.ykb.architecture.testservices.microservice_insight_engine.repository.ApiRelationRepository;
 import com.ykb.architecture.testservices.microservice_insight_engine.repository.ServiceEngagementChangeRepository;
+import com.ykb.architecture.testservices.microservice_insight_engine.dto.ApplicationRelationsDTO;
+import com.ykb.architecture.testservices.microservice_insight_engine.dto.ServiceDTO;
+import com.ykb.architecture.testservices.microservice_insight_engine.dto.PathDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,5 +201,69 @@ public class ApiRelationService {
     
     public List<ServiceEngagementChange> getAllEngagementChanges() {
         return serviceEngagementChangeRepository.findAll();
+    }
+
+    public ApplicationRelationsDTO getApplicationRelations(String organizationName, String productName, String applicationName) {
+        // Uygulama provider olarak kullanıldığındaki ilişkileri al
+        List<ApiRelation> consumedByRelations = apiRelationRepository.findByProviderOrganizationAndProviderProductAndProviderApplication(
+                organizationName, productName, applicationName);
+        
+        // Uygulama consumer olarak davrandığındaki ilişkileri al
+        List<ApiRelation> providedByRelations = apiRelationRepository.findByConsumerOrganizationAndConsumerProductAndConsumerApplication(
+                organizationName, productName, applicationName);
+        
+        // Consumers listesini oluştur
+        List<ServiceDTO> consumers = new ArrayList<>();
+        Map<String, ServiceDTO> consumersMap = new HashMap<>();
+        
+        for (ApiRelation relation : consumedByRelations) {
+            String key = relation.getConsumerOrganization() + ":" + relation.getConsumerProduct() + ":" + relation.getConsumerApplication();
+            
+            // Consumer servis DTOsunu al veya oluştur
+            ServiceDTO consumerDTO = consumersMap.computeIfAbsent(key, k -> 
+                new ServiceDTO(
+                    relation.getConsumerOrganization(),
+                    relation.getConsumerProduct(),  // product name olarak gönderildi
+                    relation.getConsumerApplication(),
+                    new ArrayList<>()
+                )
+            );
+            
+            // Paths ekle
+            for (EdgeDetail detail : relation.getDetails()) {
+                consumerDTO.getPaths().add(new PathDTO(detail.getPath(), detail.getMethod()));
+            }
+        }
+        
+        // Consumers map'ten listeye dönüştür
+        consumers.addAll(consumersMap.values());
+        
+        // Providers listesini oluştur
+        List<ServiceDTO> providers = new ArrayList<>();
+        Map<String, ServiceDTO> providersMap = new HashMap<>();
+        
+        for (ApiRelation relation : providedByRelations) {
+            String key = relation.getProviderOrganization() + ":" + relation.getProviderProduct() + ":" + relation.getProviderApplication();
+            
+            // Provider servis DTOsunu al veya oluştur
+            ServiceDTO providerDTO = providersMap.computeIfAbsent(key, k -> 
+                new ServiceDTO(
+                    relation.getProviderOrganization(),
+                    relation.getProviderProduct(),  // product name olarak gönderildi
+                    relation.getProviderApplication(),
+                    new ArrayList<>()
+                )
+            );
+            
+            // Paths ekle
+            for (EdgeDetail detail : relation.getDetails()) {
+                providerDTO.getPaths().add(new PathDTO(detail.getPath(), detail.getMethod()));
+            }
+        }
+        
+        // Providers map'ten listeye dönüştür
+        providers.addAll(providersMap.values());
+        
+        return new ApplicationRelationsDTO(providers, consumers);
     }
 }
